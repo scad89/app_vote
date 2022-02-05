@@ -6,7 +6,7 @@ class QuestionAdmin(admin.ModelAdmin):
     list_display = (
         'title',
         'date',
-        'visible',
+        'unvisible',
     )
 
 
