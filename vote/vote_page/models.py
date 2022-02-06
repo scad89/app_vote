@@ -18,7 +18,7 @@ class Question(models.Model):
 
 class Choice(models.Model):
     question = models.ForeignKey(
-        Question, on_delete=models.DO_NOTHING, related_name='choiсe')
+        Question, on_delete=models.DO_NOTHING, related_name='choice_f')
     title = models.CharField(max_length=4096)
 
     def __str__(self):
@@ -27,9 +27,9 @@ class Choice(models.Model):
 
 class Answer(models.Model):
     question = models.ForeignKey(
-        Question, on_delete=models.DO_NOTHING, related_name='question')
+        Question, on_delete=models.DO_NOTHING, related_name='answer_question')
     choice = models.ForeignKey(
-        Choice, on_delete=models.DO_NOTHING, related_name='choiсe')
+        Choice, on_delete=models.DO_NOTHING, related_name='answer_choiсe')
     created = models.DateTimeField(auto_now_add=True)
     user_id = models.ForeignKey(
         User, on_delete=models.DO_NOTHING, related_name='user')

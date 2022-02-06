@@ -1,12 +1,5 @@
 import datetime
-from random import choice
-from urllib import request
 from django.forms import ValidationError
-from django.http import HttpResponseRedirect
-from django.shortcuts import get_object_or_404
-from rest_framework.views import APIView
-from django.db.models import Avg, Count
-from django.db.models import Sum
 from rest_framework.response import Response
 from rest_framework import generics
 from rest_framework import permissions
@@ -18,13 +11,14 @@ from .serializers import (
     ChoiceCreateSerializer,
     UpdateDetailQuestionSerializer,
     ChoiceSerializer,
-    ResultsSerializer
+    ResultsSerializer,
+    QuestionForChoiceDetailSerializer
 )
 
 
 class NewQuestionListView(generics.CreateAPIView):
     """Создание вопроса"""
-    permission_classes = [permissions.IsAdminUser]
+    permission_classes = [permissions.IsAuthenticated]
     queryset = Question.objects.all()
     serializer_class = QuestionSerializer
 
@@ -39,31 +33,42 @@ class UpdateQuestionListView(generics.RetrieveUpdateAPIView):
 class GetQuestionListView(generics.ListAPIView):
     """Вывод списка вопросов"""
     permission_classes = [permissions.IsAuthenticated]
-    queryset = Question.objects.filter(unvisible=False).filter(
-        date__gte=datetime.date.today())
+    queryset = Question.objects.filter(
+        unvisible=False
+    ).filter(
+        date__gte=datetime.date.today()
+    )
     serializer_class = QuestionSerializer
 
 
 class GetQuestionDetailListView(generics.RetrieveAPIView):
     """Вывод одного вопроса"""
     permission_classes = [permissions.IsAuthenticated]
-    queryset = Question.objects.all()
+    queryset = Question.objects.filter(
+        unvisible=False
+    ).filter(
+        date__gte=datetime.date.today()
+    )
     serializer_class = QuestionDetailSerializer
     lookup_field = 'pk'
 
 
-class CreateChoiseApiView(generics.CreateAPIView):
+class CreateChoiceApiView(generics.CreateAPIView):
     """Добавление варианта ответа"""
-    permission_classes = [permissions.IsAdminUser]
+    permission_classes = [permissions.IsAuthenticated]
     queryset = Choice.objects.all()
     serializer_class = ChoiceCreateSerializer
 
 
-class GetChoiseListView(generics.ListAPIView):
+class GetChoiceListView(generics.ListAPIView):
     """Вывод списка вариантов ответов"""
     permission_classes = [permissions.IsAuthenticated]
-    queryset = Choice.objects.all()
-    serializer_class = ChoiceSerializer
+    queryset = Question.objects.filter(
+        unvisible=False
+    ).filter(
+        date__gte=datetime.date.today()
+    )
+    serializer_class = QuestionForChoiceDetailSerializer
 
 
 class GetChoiceDetailListView(generics.RetrieveAPIView):
@@ -73,7 +78,7 @@ class GetChoiceDetailListView(generics.RetrieveAPIView):
     serializer_class = ChoiceSerializer
 
 
-class UpdateChoiсeListView(generics.RetrieveUpdateAPIView):
+class UpdateChoiceListView(generics.RetrieveUpdateAPIView):
     """Редактирование варианта ответа"""
     permission_classes = [permissions.IsAdminUser]
     queryset = Choice.objects.all()
@@ -88,7 +93,11 @@ class AddAnswerApiView(generics.ListCreateAPIView):
 
     def perform_create(self, serializer):
         question = serializer.validated_data.get('question')
-        if Answer.objects.filter(question=question).filter(user_id=self.request.user.id).exists():
+        if Answer.objects.filter(
+            question=question
+        ).filter(
+            user_id=self.request.user.id
+        ).exists():
             raise ValidationError(
                 'Вы уже отвечали на этот вопрос.')
         else:
@@ -101,13 +110,13 @@ class AddAnswerApiView(generics.ListCreateAPIView):
 
 
 class VotingResultsApiView(generics.ListAPIView):
+    """Вывод результатов"""
     permission_classes = [permissions.IsAuthenticated]
-#    queryset = Answer.objects.all()
-#    serializer_class = ResultsSerializer
-
-    def get(self, request):
-        question = Question.objects.all()
-        print(question)
-#        choice = Choice.objects.filter(question=question.)
-        serializer = ChoiceSerializer(choice, many=True)
-        return Response(serializer.data)
+    queryset = Question.objects.filter(
+        unvisible=False
+    ).filter(
+        date__lte=datetime.date.today()
+    ).prefetch_related(
+        'choice_f', 'answer_question'
+    )
+    serializer_class = ResultsSerializer

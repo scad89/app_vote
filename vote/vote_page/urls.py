@@ -10,13 +10,13 @@ urlpatterns = [
     path('question/<int:pk>/update_question/', views.UpdateQuestionListView.as_view(),
          name='update_question'),
 
-    path("choiсes/", views.GetChoiseListView.as_view(), name='choiсes'),
-    path("create_choiсe/", views.CreateChoiseApiView.as_view(), name='create_choiсe'),
-    path("choise/<int:pk>/", views.GetChoiceDetailListView.as_view(),
-         name='detail_choiсe'),
-    path("choiсe/<int:pk>/update_choiсe", views.UpdateChoiсeListView.as_view(),
-         name='update_choiсe'),
+    path("choices/", views.GetChoiceListView.as_view(), name='choices'),
+    path("create_choice/", views.CreateChoiceApiView.as_view(), name='create_choice'),
+    path("choice/<int:pk>/", views.GetChoiceDetailListView.as_view(),
+         name='detail_choice'),
+    path("choice/<int:pk>/update_choice", views.UpdateChoiceListView.as_view(),
+         name='update_choice'),
     path('question/<int:pk>/answer/',
          views.AddAnswerApiView.as_view(), name='answer'),
-    path('results/', views.VotingResultsApiView.as_view(), name='results')
+    path('results/', views.VotingResultsApiView.as_view(), name='results'),
 ]
