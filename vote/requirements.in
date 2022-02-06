@@ -1,7 +1,7 @@
 sqlparse
 coreapi
 coreschema
-Django
+Django<4
 djangorestframework
 django-annoying
 django-ckeditor
@@ -17,3 +17,4 @@ psycopg2
 psycopg2-binary
 python-dotenv
 python-dateutil
+Pillow
