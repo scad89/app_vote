@@ -2,32 +2,6 @@ from django.contrib import admin
 from .models import Question, Answer, Choice
 
 
-class QuestionAdmin(admin.ModelAdmin):
-    list_display = (
-        'title',
-        'date',
-        'unvisible',
-    )
-
-
-class ChoiceAdmin(admin.ModelAdmin):
-    list_display = (
-        'question',
-        'title',
-        'enabled_choise'
-    )
-    list_filter = ('question',)
-
-
-class AnswerAdmin(admin.ModelAdmin):
-    list_display = (
-        'question',
-        'choice',
-        'created',
-        'user_id'
-    )
-
-
-admin.site.register(Question, QuestionAdmin)
-admin.site.register(Choice, ChoiceAdmin)
-admin.site.register(Answer, AnswerAdmin)
+admin.site.register(Question)
+admin.site.register(Choice)
+admin.site.register(Answer)

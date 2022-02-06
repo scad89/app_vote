@@ -1,7 +1,7 @@
 sqlparse
 coreapi
 coreschema
-Django
+Django<4
 djangorestframework
 django-annoying
 django-ckeditor

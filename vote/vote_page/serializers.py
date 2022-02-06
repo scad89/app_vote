@@ -1,12 +1,13 @@
 from rest_framework import serializers
 from .models import Answer, Question, Choice
+from django.db.models import Avg, Count
 
 
 class ChoiceCreateSerializer(serializers.ModelSerializer):
     """Добавление варианта ответа"""
     class Meta:
         model = Choice
-        fields = ['pk', 'question', 'title', 'enabled_choise', ]
+        fields = ['pk', 'question', 'title']
 
 
 class QuestionSerializer(serializers.ModelSerializer):
@@ -18,27 +19,20 @@ class QuestionSerializer(serializers.ModelSerializer):
 
 class ChoiceSerializer(serializers.ModelSerializer):
     """Вывод списка вариантов ответов"""
-    question = QuestionSerializer(read_only=True, many=False)
+    question = serializers.SlugRelatedField(slug_field='title', read_only=True)
 
     class Meta:
         model = Choice
-        fields = ['pk', 'question', 'title', 'enabled_choise']
-
-
-class ChoiseDetailSerializer(serializers.ModelSerializer):
-    """Редактирование вопроса"""
-    class Meta:
-        model = Choice
-        fields = ['pk', 'question', 'title', 'enabled_choise']
+        fields = ['pk', 'question', 'title']
 
 
 class QuestionDetailSerializer(serializers.ModelSerializer):
     """Вывод одного вопроса"""
-    choise = ChoiceCreateSerializer(many=True)
+    choiсe = ChoiceCreateSerializer(many=True)
 
     class Meta:
         model = Question
-        fields = ['title', 'date', 'choise']
+        fields = ['title', 'date', 'choiсe']
 
 
 class UpdateDetailQuestionSerializer(serializers.ModelSerializer):
@@ -50,6 +44,13 @@ class UpdateDetailQuestionSerializer(serializers.ModelSerializer):
 
 class AnswerSerializer(serializers.ModelSerializer):
     """Добавление ответа пользователем"""
+    class Meta:
+        model = Answer
+        fields = ['question', 'choice']
+
+
+class ResultsSerializer(serializers.ModelSerializer):
+    """Вывод результатов"""
     class Meta:
         model = Answer
         fields = ['question', 'choice']

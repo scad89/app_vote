@@ -1,4 +1,12 @@
 import datetime
+from random import choice
+from urllib import request
+from django.forms import ValidationError
+from django.http import HttpResponseRedirect
+from django.shortcuts import get_object_or_404
+from rest_framework.views import APIView
+from django.db.models import Avg, Count
+from django.db.models import Sum
 from rest_framework.response import Response
 from rest_framework import generics
 from rest_framework import permissions
@@ -10,7 +18,7 @@ from .serializers import (
     ChoiceCreateSerializer,
     UpdateDetailQuestionSerializer,
     ChoiceSerializer,
-    ChoiseDetailSerializer
+    ResultsSerializer
 )
 
 
@@ -41,6 +49,7 @@ class GetQuestionDetailListView(generics.RetrieveAPIView):
     permission_classes = [permissions.IsAuthenticated]
     queryset = Question.objects.all()
     serializer_class = QuestionDetailSerializer
+    lookup_field = 'pk'
 
 
 class CreateChoiseApiView(generics.CreateAPIView):
@@ -50,18 +59,25 @@ class CreateChoiseApiView(generics.CreateAPIView):
     serializer_class = ChoiceCreateSerializer
 
 
-class GetChoiseListView(generics.ListAPIView):    # вывести сами вопросы а не id
+class GetChoiseListView(generics.ListAPIView):
     """Вывод списка вариантов ответов"""
     permission_classes = [permissions.IsAuthenticated]
     queryset = Choice.objects.all()
     serializer_class = ChoiceSerializer
 
 
+class GetChoiceDetailListView(generics.RetrieveAPIView):
+    """Вывод одного вопроса"""
+    permission_classes = [permissions.IsAuthenticated]
+    queryset = Choice.objects.all()
+    serializer_class = ChoiceSerializer
+
+
 class UpdateChoiсeListView(generics.RetrieveUpdateAPIView):
-    """Редактирование вопроса"""
+    """Редактирование варианта ответа"""
     permission_classes = [permissions.IsAdminUser]
     queryset = Choice.objects.all()
-    serializer_class = ChoiseDetailSerializer
+    serializer_class = ChoiceSerializer
 
 
 class AddAnswerApiView(generics.ListCreateAPIView):
@@ -70,15 +86,28 @@ class AddAnswerApiView(generics.ListCreateAPIView):
     queryset = Answer.objects.all()
     serializer_class = AnswerSerializer
 
-    def get(self, request):
-        queryset = Question.objects.all()
-        serializer = QuestionDetailSerializer(queryset, many=True)
-        return Response(serializer.data)
-
-    def post(self, request):
-        queryset = Answer.objects.all()
-        serializer = AnswerSerializer(queryset, many=True)
-        return Response(serializer.data)
-
     def perform_create(self, serializer):
-        serializer.save(user_id=self.request.user)
+        question = serializer.validated_data.get('question')
+        if Answer.objects.filter(question=question).filter(user_id=self.request.user.id).exists():
+            raise ValidationError(
+                'Вы уже отвечали на этот вопрос.')
+        else:
+            serializer.save(user_id=self.request.user)
+
+    def get(self, request, pk):
+        p = Choice.objects.filter(question_id=pk).all()
+        serializer = ChoiceSerializer(p, many=True)
+        return Response(serializer.data)
+
+
+class VotingResultsApiView(generics.ListAPIView):
+    permission_classes = [permissions.IsAuthenticated]
+#    queryset = Answer.objects.all()
+#    serializer_class = ResultsSerializer
+
+    def get(self, request):
+        question = Question.objects.all()
+        print(question)
+#        choice = Choice.objects.filter(question=question.)
+        serializer = ChoiceSerializer(choice, many=True)
+        return Response(serializer.data)
