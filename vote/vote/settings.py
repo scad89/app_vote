@@ -37,6 +37,9 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'drf_yasg',
+    'vote_page',
+    'rest_framework',
 ]
 
 MIDDLEWARE = [
@@ -67,6 +70,15 @@ TEMPLATES = [
     },
 ]
 
+REST_FRAMEWORK = {
+    'DEFAULT_RENDERER_CLASSES': (
+        'rest_framework.renderers.JSONRenderer',
+        'rest_framework.renderers.BrowsableAPIRenderer',
+    ),
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
+    'PAGE_SIZE': 3
+}
+
 WSGI_APPLICATION = 'vote.wsgi.application'
 
 
@@ -75,8 +87,12 @@ WSGI_APPLICATION = 'vote.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'vote_db',
+        'USER': 'postgres',
+        'PASSWORD': '176GqaT@vAf',
+        'HOST': 'localhost',
+        'PORT': '5432',
     }
 }
 
