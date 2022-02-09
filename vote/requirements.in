@@ -3,6 +3,7 @@ coreapi
 coreschema
 Django
 djangorestframework
+drf-yasg
 django-annoying
 django-ckeditor
 django-cors-headers
